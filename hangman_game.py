@@ -1,0 +1,61 @@
+import random
+
+# List of 5 predefined words
+words = ["python", "hangman", "coding", "program", "computer"]
+
+# Choose a random word from the list
+target_word = random.choice(words)
+
+# Set up tracking variables
+guessed_letters = []
+incorrect_guesses = 0
+max_incorrect = 6
+
+print("=== WELCOME TO HANGMAN ===")
+print("Guess the word one letter at a time.")
+print(f"You have {max_incorrect} incorrect guesses allowed.\n")
+
+# Main game loop
+while incorrect_guesses < max_incorrect:
+    # Build the display string (e.g., "p y t h o n" or "_ _ _ _ _ _")
+    display_word = ""
+    for letter in target_word:
+        if letter in guessed_letters:
+            display_word += letter + " "
+        else:
+            display_word += "_ "
+
+    print(f"Word: {display_word.strip()}")
+    print(f"Incorrect guesses remaining: {max_incorrect - incorrect_guesses}")
+    print(f"Guessed letters: {', '.join(guessed_letters) if guessed_letters else 'None'}")
+
+    # Check if player has guessed all letters
+    if "_" not in display_word:
+        print("\n🎉 Congratulations! You guessed the word correctly!")
+        break
+
+    # Get player input
+    guess = input("Guess a letter: ").lower().strip()
+
+    # Input validation
+    if len(guess) != 1 or not guess.isalpha():
+        print("⚠️ Please enter a single letter.\n")
+        continue
+
+    if guess in guessed_letters:
+        print("⚠️ You already guessed that letter!\n")
+        continue
+
+    # Add guess to history
+    guessed_letters.append(guess)
+
+    # Check if guess is correct or incorrect
+    if guess in target_word:
+        print(f"✅ Good guess! '{guess}' is in the word.\n")
+    else:
+        incorrect_guesses += 1
+        print(f"❌ Sorry, '{guess}' is not in the word.\n")
+
+# Game over check
+if incorrect_guesses == max_incorrect:
+    print(f"☠️ Game Over! You ran out of guesses. The word was '{target_word}'.")

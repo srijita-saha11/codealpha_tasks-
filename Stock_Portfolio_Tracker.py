@@ -1,0 +1,85 @@
+import csv
+
+# 1. Hardcoded dictionary for stock prices
+stock_prices = {
+    "AAPL": 180,
+    "TSLA": 250,
+    "GOOGL": 140,
+    "AMZN": 175,
+    "MSFT": 400
+}
+
+portfolio = {}
+total_investment = 0.0
+
+print("--- Welcome to the Stock Portfolio Tracker ---")
+print("Available stocks:", ", ".join(stock_prices.keys()))
+print("-" * 45)
+
+# 2. User input loop
+while True:
+    stock_name = input("Enter stock ticker symbol (or 'done' to finish): ").strip().upper()
+    
+    if stock_name == 'DONE':
+        break
+        
+    if stock_name not in stock_prices:
+        print(f"Error: '{stock_name}' is not in the price list. Please select from: {list(stock_prices.keys())}\n")
+        continue
+
+    try:
+        quantity = int(input(f"Enter quantity for {stock_name}: "))
+        if quantity <= 0:
+            print("Quantity must be greater than 0.\n")
+            continue
+            
+        # Add or update quantity in portfolio
+        portfolio[stock_name] = portfolio.get(stock_name, 0) + quantity
+        print(f"Added {quantity} shares of {stock_name}.\n")
+        
+    except ValueError:
+        print("Invalid input! Please enter a whole number for quantity.\n")
+
+# 3. Display summary and calculate total investment value
+print("\n" + "=" * 45)
+print("PORTFOLIO SUMMARY")
+print("=" * 45)
+
+if not portfolio:
+    print("No stocks added to portfolio.")
+else:
+    for stock, qty in portfolio.items():
+        price = stock_prices[stock]
+        value = stock * price  # Value calculation
+        stock_value = qty * price
+        total_investment += stock_value
+        print(f"{stock}: {qty} shares @ ${price} each = ${stock_value:,.2f}")
+        
+    print("-" * 45)
+    print(f"TOTAL INVESTMENT VALUE: ${total_investment:,.2f}")
+    print("=" * 45)
+
+    # 4. Optional: Save result to a file (.csv or .txt)
+    save_option = input("\nWould you like to save this summary to a file? (txt/csv/no): ").strip().lower()
+    
+    if save_option in ['txt', 'text']:
+        with open("portfolio_summary.txt", "w") as file:
+            file.write("PORTFOLIO SUMMARY\n")
+            file.write("-" * 30 + "\n")
+            for stock, qty in portfolio.items():
+                price = stock_prices[stock]
+                file.write(f"{stock}: {qty} shares @ ${price} = ${qty * price:,.2f}\n")
+            file.write("-" * 30 + "\n")
+            file.write(f"Total Investment Value: ${total_investment:,.2f}\n")
+        print("Saved successfully to 'portfolio_summary.txt'!")
+
+    elif save_option == 'csv':
+        with open("portfolio_summary.csv", "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(["Stock", "Quantity", "Price Per Share", "Total Value"])
+            for stock, qty in portfolio.items():
+                price = stock_prices[stock]
+                writer.writerow([stock, qty, f"${price}", f"${qty * price:,.2f}"])
+            writer.writerow([])
+            writer.writerow(["TOTAL", "", "", f"${total_investment:,.2f}"])
+        print("Saved successfully to 'portfolio_summary.csv'!")
